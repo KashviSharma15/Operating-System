@@ -1,36 +1,65 @@
 #include <iostream>
-
+#include <vector>
 using namespace std;
 
 int main() {
-    int ms, i, ps[20], n, size, p[20], s, intr = 0;
+    vector<int> processIDs;
+    vector<int> processSize;
+    int internalFragmentation = 0;
+    int n;
 
-    cout << "Enter size of memory: ";
-    cin >> ms;
-
-    cout << "Enter memory for OS: ";
-    cin >> s;
-
-    ms -= s;
-
-    cout << "Enter number of partitions to be divided: ";
+    cout << "Enter the number of processes : ";
     cin >> n;
 
-    size = ms / n;
+    for (int i = 0; i < n; i++) {
+        int ID, Size;
+        cout << "Enter Process ID and size for process " << i + 1 << ": ";
+        cin >> ID >> Size;
+        processIDs.push_back(ID);
+        processSize.push_back(Size);
+    }
 
-    for (i = 0; i < n; i++) {
-        cout << "\nEnter process ID and process size: ";
-        cin >> p[i] >> ps[i];
+    int partitionSize = 0;
+    for (int i = 0; i < n; i++) {
+        if (processSize[i] > partitionSize)
+            partitionSize = processSize[i];
+    }
 
-        if (ps[i] <= size) {
-            intr += (size - ps[i]); 
-            cout << "Process " << p[i] << " is allocated.\n";
+    cout << "\nAllocation for Cycle 1 \n";
+    for (int i = 0; i < n; i++) {
+        if (processSize[i] <= partitionSize) {
+            cout << "Process " << processIDs[i] << " is allocated\n";
+            internalFragmentation += (partitionSize - processSize[i]);
         } else {
-            cout << "Process " << p[i] << " is blocked.\n";
+            cout << "Process " << processIDs[i] << " is not allocated\n";
+        }
+    }
+    cout << "\nTotal internal Fragmentation is: " << internalFragmentation << endl;
+    
+    char choice;
+    cout << "\nDo you want to enter a second cycle of processes (y/n): ";
+    cin >> choice;
+
+    if (choice == 'y' || choice == 'Y') {
+        int m;
+        cout << "\nEnter the number of processes (Cycle 2): ";
+        cin >> m;
+
+        for (int i = 0; i < m; i++) {
+            int ID, Size;
+            cout << "Enter Process ID and size for process " << i + 1 << ": ";
+            cin >> ID >> Size;
+
+            if (Size <= partitionSize) {
+                cout << "Process " << ID << " is allocated\n";
+                internalFragmentation = 0;
+                internalFragmentation += (partitionSize - Size);
+            } else {
+                cout << "Process " << ID << " is not allocated\n";
+            }
         }
     }
 
-    cout << "\nInternal fragmentation is " << intr << endl;
-
+    cout << "\nTotal internal Fragmentation is: " << internalFragmentation << endl;
     return 0;
 }
